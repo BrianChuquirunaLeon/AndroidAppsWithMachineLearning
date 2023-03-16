@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.example.vc_android.helpers.ImageHelperActivity;
+import com.example.vc_android.image.FlowerIdentificationActivity;
+import com.example.vc_android.image.ImageClassificationActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,7 +20,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void onGoToImageActivity(View view){
         //start the image helper activity
-        Intent intent = new Intent(this, ImageHelperActivity.class);
+        Intent intent = new Intent(this, ImageClassificationActivity.class);
+        startActivity(intent);
+    }
+
+    public void onGoToFlowerIdentification(View view){
+        //start the image helper activity
+        Intent intent = new Intent(this, FlowerIdentificationActivity.class);
         startActivity(intent);
     }
 }

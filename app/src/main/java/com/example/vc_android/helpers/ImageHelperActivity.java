@@ -16,37 +16,30 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import com.example.vc_android.R;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.mlkit.vision.common.InputImage;
-import com.google.mlkit.vision.label.ImageLabel;
-import com.google.mlkit.vision.label.ImageLabeler;
-import com.google.mlkit.vision.label.ImageLabeling;
-import com.google.mlkit.vision.label.defaults.ImageLabelerOptions;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 public class ImageHelperActivity extends AppCompatActivity {
 
     private static int REQUEST_PICK_IMAGE= 1000;
     private static int REQUEST_CAPTURE_IMAGE= 1001;
+
     private ImageView inputImageView;
     private TextView outputTextView;
-
-    //ImageLaber class allow to analyze images and get labels from them, this is a library from "Firebase ML"
-    private ImageLabeler imageLabeler;
-
     private File photoFile;
+
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +50,7 @@ public class ImageHelperActivity extends AppCompatActivity {
         inputImageView = findViewById(R.id.imageViewInput);
         outputTextView = findViewById(R.id.textViewOutPut);
 
-        imageLabeler = ImageLabeling.getClient(new ImageLabelerOptions.Builder()
-                .setConfidenceThreshold(0.7f)//only assign a label if overcome this confidence
-                .build());
+
 
 
         //Ask for persmission
@@ -72,11 +63,11 @@ public class ImageHelperActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.d(ImageHelperActivity.class.getSimpleName(),"grant result for "+permissions[0]+" is "+grantResults[0]);
-    }
+//    @Override
+//    public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        Log.d(ImageHelperActivity.class.getSimpleName(),"grant result for "+permissions[0]+" is "+grantResults[0]);
+//    }
 
     public void onPickImage(View view){
         //allow the app to request another kind of content from other apps, it could be Gallery, GooglePhotos, OneDrive or another app
@@ -155,32 +146,15 @@ public class ImageHelperActivity extends AppCompatActivity {
         return bitmap;
     }
 
-    private void runClassification(Bitmap bitmap){
-        InputImage inputImage = InputImage.fromBitmap(bitmap,0);
-        //imageLabeler use machine learning in order to process inputImage get the labels, then pass the result to addOnSuccessListener
-        imageLabeler.process(inputImage).addOnSuccessListener(new OnSuccessListener<List<ImageLabel>>() {//List<ImageLabel> get the list of label clasificarion find out in the photo
-            @Override
-            public void onSuccess(@NonNull List<ImageLabel> imageLabels) {
-                if(imageLabels.size() > 0){//verify that there is more than zero object labels
-                    StringBuilder builder = new StringBuilder();//create a new String
-                    //create and save the necesary String format in order to display in the screen
-                    for(ImageLabel label: imageLabels){
-                        builder.append(label.getText())
-                                .append(" : ")
-                                .append(label.getConfidence())
-                                .append("\n");
-                    }
-                    outputTextView.setText(builder.toString());//send the text in the screen
-                }else{
-                    outputTextView.setText("Could not classify");
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
+    protected void runClassification(Bitmap bitmap){
 
-            }
-        });
+    }
 
+    protected TextView getOutputTextView(){
+        return outputTextView;
+    }
+
+    protected ImageView getInputImageView(){
+        return inputImageView;
     }
 }
