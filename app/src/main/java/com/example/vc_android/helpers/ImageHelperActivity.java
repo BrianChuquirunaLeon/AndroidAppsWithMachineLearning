@@ -37,10 +37,6 @@ public class ImageHelperActivity extends AppCompatActivity {
     private File photoFile;
 
 
-
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

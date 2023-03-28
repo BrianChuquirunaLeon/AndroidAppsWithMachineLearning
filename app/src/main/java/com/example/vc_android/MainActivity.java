@@ -9,6 +9,7 @@ import android.view.View;
 import com.example.vc_android.helpers.ImageHelperActivity;
 import com.example.vc_android.image.FlowerIdentificationActivity;
 import com.example.vc_android.image.ImageClassificationActivity;
+import com.example.vc_android.image.LeafDiseaseIdentificationActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,6 +28,12 @@ public class MainActivity extends AppCompatActivity {
     public void onGoToFlowerIdentification(View view){
         //start the image helper activity
         Intent intent = new Intent(this, FlowerIdentificationActivity.class);
+        startActivity(intent);
+    }
+
+    public void onGoToLeafDiseaseIdentification(View view){
+        //start the image helper activity
+        Intent intent = new Intent(this, LeafDiseaseIdentificationActivity.class);
         startActivity(intent);
     }
 }

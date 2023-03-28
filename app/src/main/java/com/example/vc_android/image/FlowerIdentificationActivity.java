@@ -30,14 +30,13 @@ public class FlowerIdentificationActivity extends ImageClassificationActivity{
                 .setMaxResultCount(5).build();
         imageLabeler = ImageLabeling.getClient(options);
 
-
     }
 
     @Override
     protected void runClassification(final Bitmap bitmap) {
         InputImage inputImage = InputImage.fromBitmap(bitmap,0);
         //imageLabeler use machine learning in order to process inputImage get the labels, then pass the result to addOnSuccessListener
-        imageLabeler.process(inputImage).addOnSuccessListener(new OnSuccessListener<List<ImageLabel>>() {//List<ImageLabel> get the list of label clasificarion find out in the photo
+        imageLabeler.process(inputImage).addOnSuccessListener(new OnSuccessListener<List<ImageLabel>>() {//List<ImageLabel> get the list of label clasification find out in the photo
             @Override
             public void onSuccess(@NonNull List<ImageLabel> imageLabels) {
                 if(imageLabels.size() > 0){//verify that there is more than zero object labels
