@@ -32,7 +32,7 @@ public class LeafDiseaseIdentificationActivity extends ImageHelperActivity {
         super.onCreate(savedInstanceState);
         try {
 
-            module = Module.load(assetFilePath(this,"model_know_normalize_from_pt_to_ptl.ptl"));
+            module = Module.load(assetFilePath(this,"mobile_only_grape_LeNet_model_12.ptl"));
 
         }catch (IOException e){
             Log.e("PTRTDryRun","Error reading assets",e);
