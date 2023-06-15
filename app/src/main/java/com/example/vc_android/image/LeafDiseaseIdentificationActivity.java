@@ -3,6 +3,7 @@ package com.example.vc_android.image;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -32,26 +33,26 @@ public class LeafDiseaseIdentificationActivity extends ImageHelperActivity {
         super.onCreate(savedInstanceState);
         try {
 
-            module = Module.load(assetFilePath(this,"mobile_only_grape_LeNet_model_12.ptl"));
+            module = Module.load(assetFilePath(this, "mobile_only_grape_LeNet_model_12.ptl"));
 
-        }catch (IOException e){
-            Log.e("PTRTDryRun","Error reading assets",e);
+        } catch (IOException e) {
+            Log.e("PTRTDryRun", "Error reading assets", e);
             finish();
         }
     }
 
     public static String assetFilePath(Context context, String assetName) throws IOException {
-        File file = new File (context.getFilesDir(),assetName);
-        if(file.exists() && file.length()>0){
+        File file = new File(context.getFilesDir(), assetName);
+        if (file.exists() && file.length() > 0) {
             return file.getAbsolutePath();
         }
 
-        try(InputStream is = context.getAssets().open(assetName)){
-            try(OutputStream os = new FileOutputStream(file)){
-                byte[] buffer = new byte[4*1024];
+        try (InputStream is = context.getAssets().open(assetName)) {
+            try (OutputStream os = new FileOutputStream(file)) {
+                byte[] buffer = new byte[4 * 1024];
                 int read;
-                while ( (read=is.read(buffer)) !=-1 ){
-                    os.write(buffer,0,read);
+                while ((read = is.read(buffer)) != -1) {
+                    os.write(buffer, 0, read);
                 }
                 os.flush();
             }
@@ -59,7 +60,7 @@ public class LeafDiseaseIdentificationActivity extends ImageHelperActivity {
         }
     }
 
-    public String[] getClassesNames(){
+    public String[] getClassesNames() {
         InputStream inputStream = getResources().openRawResource(R.raw.classes_names);
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
@@ -81,31 +82,42 @@ public class LeafDiseaseIdentificationActivity extends ImageHelperActivity {
 
     protected void runClassification(final Bitmap bitmap) {
         Bitmap argbBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-        final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(argbBitmap,
-                TensorImageUtils.TORCHVISION_NORM_MEAN_RGB,TensorImageUtils.TORCHVISION_NORM_STD_RGB);
+//        Bitmap argbBitmap;
+//        //Si la imagen es del tamaño de entrada de la CNN no se hace nada
+//        if (_argbBitmap.getHeight()==256 && _argbBitmap.getWidth()==256){
+//            argbBitmap = _argbBitmap;
+//        }else{//Pero en caso la imagen no sea del mismo ancho y alto de la capa de entrada de la CNN entrenada, entonces hacemos un resize
+//            argbBitmap = Bitmap.createScaledBitmap(_argbBitmap,256,256,true);
+//        }
 
+        try {
+            final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(argbBitmap,
+                    TensorImageUtils.TORCHVISION_NORM_MEAN_RGB, TensorImageUtils.TORCHVISION_NORM_STD_RGB);
 
-        //running the model
-        final Tensor outputTensor = this.module.forward(IValue.from(inputTensor)).toTensor();
+            //running the model
+            final Tensor outputTensor = this.module.forward(IValue.from(inputTensor)).toTensor();
 
-        //getting tensor content as java arrary of floats
-        final float[] scores = outputTensor.getDataAsFloatArray();
+            //getting tensor content as java arrary of floats
+            final float[] scores = outputTensor.getDataAsFloatArray();
 
-
-        for (int i = 0; i < scores.length; i++) {
-            System.out.println(scores[i]);
-        }
-        //searching for the index with maximun score
-        float maxScore = -Float.MAX_VALUE;
-        int maxScoreIdx = -1;
-        for(int i=0; i<scores.length;i++){
-            if (scores[i]>maxScore){
-                maxScore=scores[i];
-                maxScoreIdx = i;
+            for (int i = 0; i < scores.length; i++) {
+                System.out.println(scores[i]);
             }
+            //searching for the index with maximun score
+            float maxScore = -Float.MAX_VALUE;
+            int maxScoreIdx = -1;
+            for (int i = 0; i < scores.length; i++) {
+                if (scores[i] > maxScore) {
+                    maxScore = scores[i];
+                    maxScoreIdx = i;
+                }
+            }
+            String[] classes = getClassesNames();
+            String className = classes[maxScoreIdx];
+            getOutputTextView().setText(className);
+
+        } catch (Exception e) {
+            Log.i("CAMARA_ERROR", e.toString());
         }
-        String[] classes = getClassesNames();
-        String className = classes[maxScoreIdx];
-        getOutputTextView().setText(className);
     }
 }
