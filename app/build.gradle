@@ -45,4 +45,8 @@ dependencies {
     //custom image classification with pytoch
     implementation 'org.pytorch:pytorch_android:1.10.0'
     implementation 'org.pytorch:pytorch_android_torchvision:1.10.0'
+    //crop image
+    implementation 'com.github.yalantis:ucrop:2.2.6-native'
+
+
 }

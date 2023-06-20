@@ -16,11 +16,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import com.example.vc_android.R;
+import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +36,9 @@ public class ImageHelperActivity extends AppCompatActivity {
 
     private ImageView inputImageView;
     private TextView outputTextView;
-    private File photoFile;
+//    private File photoFile;
+    private Uri cameraUri;
+    private final String SAMPLE_CROPPED_IMG_NAME = "sampleCropImg.jpg";
 
 
     @Override
@@ -87,14 +91,7 @@ public class ImageHelperActivity extends AppCompatActivity {
 //        Log.d(ImageHelperActivity.class.getSimpleName(),"grant result for "+permissions[0]+" is "+grantResults[0]);
 //    }
 
-    public void onPickImage(View view){
-        //allow the app to request another kind of content from other apps, it could be Gallery, GooglePhotos, OneDrive or another app
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        //accept images with whatever extension as ".jpg",".png",etc
-        intent.setType("image/*");
 
-        startActivityForResult(intent,REQUEST_PICK_IMAGE);
-    }
 
 
     //onActivityResult is used in order to get results of secondary activitys which was start from the current activity
@@ -109,11 +106,19 @@ public class ImageHelperActivity extends AppCompatActivity {
             Bitmap bitmap = null;
             //verify if this request is from request pick image
             if(requestCode==REQUEST_PICK_IMAGE){
-                Uri uri = data.getData();
-                bitmap = loadFromUri(uri);
+                final Uri uri = data.getData();
+                startCrop(uri);//crop image
             }else if(requestCode==REQUEST_CAPTURE_IMAGE){
-                Log.d("ML", "received callback from camera");
-                bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+                Log.i("ML", "received callback from camera");
+//                bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+                startCrop(cameraUri);//crop image
+            }else if(requestCode== UCrop.REQUEST_CROP){
+                final Uri imageUriResultCrop = UCrop.getOutput(data);
+                if(imageUriResultCrop != null){
+                    bitmap = loadFromUri(imageUriResultCrop);
+                }
+            }else if (resultCode == UCrop.RESULT_ERROR) {
+                final Throwable cropError = UCrop.getError(data);
             }
 
             Bitmap _argbBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
@@ -128,22 +133,37 @@ public class ImageHelperActivity extends AppCompatActivity {
             //clasify the image give it as bitmap
             runClassification(argbBitmap);
 
-
-
         }
+    }
+
+    public void onPickImage(View view){
+        //allow the app to request another kind of content from other apps, it could be Gallery, GooglePhotos, OneDrive or another app
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        //accept images with whatever extension as ".jpg",".png",etc
+        intent.setType("image/*");
+
+        startActivityForResult(intent,REQUEST_PICK_IMAGE);
     }
 
     public void onStarCamera(View view){
         //create a file to share with camera
-        photoFile = createPhotoFile();
-        Uri fileUri = FileProvider.getUriForFile(this,"com.example.fileprovider",photoFile);
+        File photoFile = createPhotoFile();
+        cameraUri = FileProvider.getUriForFile(this,"com.example.fileprovider",photoFile);
 
         //create a intent
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT,fileUri);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT,cameraUri);
 
         //startActivityForResult
         startActivityForResult(intent,REQUEST_CAPTURE_IMAGE);
+    }
+
+    private void startCrop(@NonNull Uri uri){
+
+        UCrop.of(uri, Uri.fromFile(new File(getCacheDir(),this.SAMPLE_CROPPED_IMG_NAME)))
+                .withAspectRatio(1, 1)
+                .withMaxResultSize(256, 256)
+                .start(this);
     }
 
     public File createPhotoFile(){
@@ -173,6 +193,8 @@ public class ImageHelperActivity extends AppCompatActivity {
         }
         return bitmap;
     }
+
+
 
     protected void runClassification(Bitmap bitmap){
 
