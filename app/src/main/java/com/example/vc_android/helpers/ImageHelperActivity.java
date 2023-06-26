@@ -91,9 +91,6 @@ public class ImageHelperActivity extends AppCompatActivity {
 //        Log.d(ImageHelperActivity.class.getSimpleName(),"grant result for "+permissions[0]+" is "+grantResults[0]);
 //    }
 
-
-
-
     //onActivityResult is used in order to get results of secondary activitys which was start from the current activity
     //this function is automatically called when the secondary activity is complet and return a result to the current activity.
     //requestCode:a request code which was used to start the secondary activity. It is used in order to indentify the secondary activity which was complete
@@ -103,7 +100,7 @@ public class ImageHelperActivity extends AppCompatActivity {
     protected void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode==RESULT_OK){
-            Bitmap bitmap = null;
+
             //verify if this request is from request pick image
             if(requestCode==REQUEST_PICK_IMAGE){
                 final Uri uri = data.getData();
@@ -115,24 +112,24 @@ public class ImageHelperActivity extends AppCompatActivity {
             }else if(requestCode== UCrop.REQUEST_CROP){
                 final Uri imageUriResultCrop = UCrop.getOutput(data);
                 if(imageUriResultCrop != null){
-                    bitmap = loadFromUri(imageUriResultCrop);
+
+                    Bitmap bitmap = loadFromUri(imageUriResultCrop);
+
+                    Bitmap _argbBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+                    Bitmap argbBitmap;
+                    //Si la imagen es del tamaño de entrada de la CNN no se hace nada
+                    if (_argbBitmap.getHeight()==256 && _argbBitmap.getWidth()==256){
+                        argbBitmap = _argbBitmap;
+                    }else{//Pero en caso la imagen no sea del mismo ancho y alto de la capa de entrada de la CNN entrenada, entonces hacemos un resize
+                        argbBitmap = Bitmap.createScaledBitmap(_argbBitmap,256,256,true);
+                    }
+                    inputImageView.setImageBitmap(argbBitmap);
+                    //clasify the image give it as bitmap
+                    runClassification(argbBitmap);
                 }
             }else if (resultCode == UCrop.RESULT_ERROR) {
                 final Throwable cropError = UCrop.getError(data);
             }
-
-            Bitmap _argbBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-            Bitmap argbBitmap;
-            //Si la imagen es del tamaño de entrada de la CNN no se hace nada
-            if (_argbBitmap.getHeight()==256 && _argbBitmap.getWidth()==256){
-                argbBitmap = _argbBitmap;
-            }else{//Pero en caso la imagen no sea del mismo ancho y alto de la capa de entrada de la CNN entrenada, entonces hacemos un resize
-                argbBitmap = Bitmap.createScaledBitmap(_argbBitmap,256,256,true);
-            }
-            inputImageView.setImageBitmap(argbBitmap);
-            //clasify the image give it as bitmap
-            runClassification(argbBitmap);
-
         }
     }
 

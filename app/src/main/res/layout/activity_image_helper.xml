@@ -19,6 +19,8 @@
         android:id="@+id/imageViewInput"
         android:layout_width="match_parent"
         android:layout_height="400dp"
+        android:contentDescription="Imagen a analizar"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
