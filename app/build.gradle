@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.vc_android'
+    namespace 'com.brianchuquiruna.vc_android'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.vc_android"
+        applicationId "com.brianchuquiruna.vc_android"
         minSdk 24
         targetSdk 33
         versionCode 1

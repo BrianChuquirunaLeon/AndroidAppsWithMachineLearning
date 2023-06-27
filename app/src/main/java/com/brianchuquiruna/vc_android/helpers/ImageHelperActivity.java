@@ -1,4 +1,4 @@
-package com.example.vc_android.helpers;
+package com.brianchuquiruna.vc_android.helpers;
 
 import android.Manifest;
 import android.content.Intent;
@@ -21,7 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
-import com.example.vc_android.R;
+import com.brianchuquiruna.vc_android.R;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;

@@ -1,16 +1,13 @@
-package com.example.vc_android.image;
+package com.brianchuquiruna.vc_android.image;
 
 import android.content.Context;
-import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.example.vc_android.R;
-import com.example.vc_android.helpers.ImageHelperActivity;
+import com.brianchuquiruna.vc_android.R;
+import com.brianchuquiruna.vc_android.helpers.ImageHelperActivity;
 
-import org.pytorch.Device;
 import org.pytorch.IValue;
 import org.pytorch.Module;
 import org.pytorch.Tensor;

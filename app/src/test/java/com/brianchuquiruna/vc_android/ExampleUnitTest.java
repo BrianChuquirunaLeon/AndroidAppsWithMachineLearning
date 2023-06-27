@@ -1,4 +1,4 @@
-package com.example.vc_android;
+package com.brianchuquiruna.vc_android;
 
 import org.junit.Test;
 

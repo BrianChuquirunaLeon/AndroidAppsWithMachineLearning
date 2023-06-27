@@ -1,11 +1,13 @@
-package com.example.vc_android;
+package com.brianchuquiruna.vc_android;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import com.example.vc_android.image.LeafDiseaseIdentificationActivity;
+
+import com.brianchuquiruna.vc_android.R;
+import com.brianchuquiruna.vc_android.image.LeafDiseaseIdentificationActivity;
 
 public class MainActivity extends AppCompatActivity {
 
