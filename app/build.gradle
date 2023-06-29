@@ -27,6 +27,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    viewBinding {
+        enable = true
+    }
 }
 
 
@@ -44,8 +47,8 @@ dependencies {
     //custom image classification with Tensorflow (16.3.1 before version used in this project)
     implementation 'com.google.mlkit:image-labeling-custom:17.0.1'
     //custom image classification with pytoch
-    implementation 'org.pytorch:pytorch_android:1.10.0'
-    implementation 'org.pytorch:pytorch_android_torchvision:1.10.0'
+    implementation 'org.pytorch:pytorch_android:1.13.1'
+    implementation 'org.pytorch:pytorch_android_torchvision:1.13.1'
     //crop image
     implementation 'com.github.yalantis:ucrop:2.2.8-native'
 

@@ -29,12 +29,9 @@ public class LeafDiseaseIdentificationActivity extends ImageHelperActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
-
-            module = Module.load(assetFilePath(this, "mobile_only_grape_LeNet_model_12.ptl"));
-            System.out.println("Se cago el modelo");
+            module = Module.load(assetFilePath(this, "mobile_only_grape_SqueezeNet_model.ptl"));
         } catch (IOException e) {
             Log.i("PTRTDryRun", "Error reading assets", e);
-
             finish();
         }
     }
