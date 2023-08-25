@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".helpers.ImageHelperActivity">
+    tools:context="com.brianchuquiruna.vc_android.helpers.ImageHelperActivity">
 
     <TextView
         android:id="@+id/textViewOutPut"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:text="Output"
+        android:text="Enfermedad"
+        android:textColor="@color/strawberry"
+        android:background="@color/lemon_lime"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintTop_toBottomOf="@+id/imageViewInput" />
@@ -19,6 +21,9 @@
         android:id="@+id/imageViewInput"
         android:layout_width="match_parent"
         android:layout_height="400dp"
+        android:src="@drawable/ic_photo"
+        android:background="@color/basil_green"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:srcCompat="@tools:sample/avatars" />
@@ -27,37 +32,60 @@
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#ACA8A8"
+        android:background="@color/lemon_lime"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent">
 
-        <Button
-            android:id="@+id/buttonPickImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvPickImage"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="8dp"
             android:layout_marginStart="52dp"
-            android:text="Pick Image"
-            android:onClick="onPickImage"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/buttonStartCamera"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
-
-        <Button
-            android:id="@+id/buttonStartCamera"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Start Camera"
-            android:onClick="onStarCamera"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.5">
+
+            <ImageButton
+                android:id="@+id/buttonPickImage"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_galery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:onClick="onPickImage" />
+        </androidx.cardview.widget.CardView>
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvStatCamera"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="52dp"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/buttonPickImage"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.5">
+            <ImageButton
+                android:id="@+id/buttonStartCamera"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:onClick="onStarCamera"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_camera"
+                tools:layout_editor_absoluteX="198dp"
+                tools:layout_editor_absoluteY="-3dp" />
+        </androidx.cardview.widget.CardView>
+
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

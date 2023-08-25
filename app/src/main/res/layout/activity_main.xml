@@ -4,27 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:background="@color/lemon_lime"
+    tools:context="com.brianchuquiruna.vc_android.MainActivity">
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Go To Classification"
-        android:onClick="onGoToImageActivity"
+    <androidx.cardview.widget.CardView
+        app:cardCornerRadius="22dp"
+        app:cardElevation="8dp"
+        tools:cardBackgroundColor="@color/teal_200"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_marginTop="32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Go To Flower Identification"
-        android:onClick="onGoToFlowerIdentification"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button" />
+        <ImageButton
+            android:id="@+id/button3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:onClick="onGoToLeafDiseaseIdentification"
+            android:src="@drawable/uva"
+            android:background="@color/white"
+            android:scaleType="centerInside"/>
+    </androidx.cardview.widget.CardView>
+    
 </androidx.constraintlayout.widget.ConstraintLayout>

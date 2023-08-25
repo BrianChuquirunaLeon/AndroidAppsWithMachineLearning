@@ -1,4 +1,4 @@
-package com.example.vc_android.helpers;
+package com.brianchuquiruna.vc_android.helpers;
 
 import android.Manifest;
 import android.content.Intent;
@@ -16,11 +16,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
-import com.example.vc_android.R;
+import com.brianchuquiruna.vc_android.R;
+import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,11 +36,9 @@ public class ImageHelperActivity extends AppCompatActivity {
 
     private ImageView inputImageView;
     private TextView outputTextView;
-    private File photoFile;
-
-
-
-
+//    private File photoFile;
+    private Uri cameraUri;
+    private final String SAMPLE_CROPPED_IMG_NAME = "sampleCropImg.jpg";
 
 
     @Override
@@ -50,34 +50,46 @@ public class ImageHelperActivity extends AppCompatActivity {
         inputImageView = findViewById(R.id.imageViewInput);
         outputTextView = findViewById(R.id.textViewOutPut);
 
+        checkPermissions();
 
+    }
+    //Ask for persmission
+    private void checkPermissions(){
+        //External Storage permissions
 
-
-        //Ask for persmission
+        //Verify if device is a version over 24 API
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M){
             //Check if permission have already give it
-            if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
+            if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                //If we can't permissions then ask for it
+                if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    //If we can't permissions then ask for it
+                    requestPermissions(new String[]{Manifest.permission.CAMERA,Manifest.permission.READ_EXTERNAL_STORAGE}, 5);
+                }else{
+                    requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 5);
+                }
+            }else{
+                if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    //If we can't permissions then ask for it
+                    requestPermissions(new String[]{Manifest.permission.CAMERA}, 5);
+                }
             }
         }
+
+//        //Camera permissions
+//        if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+//            //If we can't permissions then ask for it
+//            requestPermissions(new String[]{Manifest.permission.CAMERA}, 5);
+//        }
     }
 
+//onRequestPermissionsResult es un metodo del S.O. de android el cual podemos sobreescribir para que una ves hemos aceptado
+// los permisos podemos hacer algo mas luego de ello.
 //    @Override
 //    public void onRequestPermissionsResult(final int requestCode, @NonNull final String[] permissions, @NonNull final int[] grantResults) {
 //        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 //        Log.d(ImageHelperActivity.class.getSimpleName(),"grant result for "+permissions[0]+" is "+grantResults[0]);
 //    }
-
-    public void onPickImage(View view){
-        //allow the app to request another kind of content from other apps, it could be Gallery, GooglePhotos, OneDrive or another app
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        //accept images with whatever extension as ".jpg",".png",etc
-        intent.setType("image/*");
-
-        startActivityForResult(intent,REQUEST_PICK_IMAGE);
-    }
-
 
     //onActivityResult is used in order to get results of secondary activitys which was start from the current activity
     //this function is automatically called when the secondary activity is complet and return a result to the current activity.
@@ -88,34 +100,67 @@ public class ImageHelperActivity extends AppCompatActivity {
     protected void onActivityResult(final int requestCode, final int resultCode, @Nullable final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode==RESULT_OK){
+
             //verify if this request is from request pick image
             if(requestCode==REQUEST_PICK_IMAGE){
-                Uri uri = data.getData();
-                Bitmap bitmap = loadFromUri(uri);
-                inputImageView.setImageBitmap(bitmap);
-                //clasify the image give it as bitmap
-                runClassification(bitmap);
+                final Uri uri = data.getData();
+                startCrop(uri);//crop image
             }else if(requestCode==REQUEST_CAPTURE_IMAGE){
-                Log.d("ML", "received callback from camera");
-                Bitmap bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                inputImageView.setImageBitmap(bitmap);
-                //clasify the image give it as bitmap
-                runClassification(bitmap);
+                Log.i("ML", "received callback from camera");
+//                bitmap = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+                startCrop(cameraUri);//crop image
+            }else if(requestCode== UCrop.REQUEST_CROP){
+                final Uri imageUriResultCrop = UCrop.getOutput(data);
+                if(imageUriResultCrop != null){
+
+                    Bitmap bitmap = loadFromUri(imageUriResultCrop);
+
+                    Bitmap _argbBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+                    Bitmap argbBitmap;
+                    //Si la imagen es del tamaño de entrada de la CNN no se hace nada
+                    if (_argbBitmap.getHeight()==256 && _argbBitmap.getWidth()==256){
+                        argbBitmap = _argbBitmap;
+                    }else{//Pero en caso la imagen no sea del mismo ancho y alto de la capa de entrada de la CNN entrenada, entonces hacemos un resize
+                        argbBitmap = Bitmap.createScaledBitmap(_argbBitmap,256,256,true);
+                    }
+                    inputImageView.setImageBitmap(argbBitmap);
+                    //clasify the image give it as bitmap
+                    runClassification(argbBitmap);
+                }
+            }else if (resultCode == UCrop.RESULT_ERROR) {
+                final Throwable cropError = UCrop.getError(data);
             }
         }
     }
 
+    public void onPickImage(View view){
+        //allow the app to request another kind of content from other apps, it could be Gallery, GooglePhotos, OneDrive or another app
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        //accept images with whatever extension as ".jpg",".png",etc
+        intent.setType("image/*");
+
+        startActivityForResult(intent,REQUEST_PICK_IMAGE);
+    }
+
     public void onStarCamera(View view){
         //create a file to share with camera
-        photoFile = createPhotoFile();
-        Uri fileUri = FileProvider.getUriForFile(this,"com.example.fileprovider",photoFile);
+        File photoFile = createPhotoFile();
+        cameraUri = FileProvider.getUriForFile(this,"com.example.fileprovider",photoFile);
 
         //create a intent
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT,fileUri);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT,cameraUri);
 
         //startActivityForResult
         startActivityForResult(intent,REQUEST_CAPTURE_IMAGE);
+    }
+
+    private void startCrop(@NonNull Uri uri){
+
+        UCrop.of(uri, Uri.fromFile(new File(getCacheDir(),this.SAMPLE_CROPPED_IMG_NAME)))
+                .withAspectRatio(1, 1)
+                .withMaxResultSize(256, 256)
+                .start(this);
     }
 
     public File createPhotoFile(){
@@ -146,6 +191,8 @@ public class ImageHelperActivity extends AppCompatActivity {
         return bitmap;
     }
 
+
+
     protected void runClassification(Bitmap bitmap){
 
     }
@@ -157,4 +204,5 @@ public class ImageHelperActivity extends AppCompatActivity {
     protected ImageView getInputImageView(){
         return inputImageView;
     }
+
 }
